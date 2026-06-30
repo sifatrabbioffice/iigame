@@ -1,0 +1,81 @@
+name: "Godot iOS Build"
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+    
+    env:
+      GODOT_VERSION: 4.7
+      GODOT_RELEASE: stable
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Unzip step সরিয়ে ফেলা হয়েছে
+
+      - name: Cache Godot Templates
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Application Support/Godot/export_templates/${{ env.GODOT_VERSION }}.${{ env.GODOT_RELEASE }}
+          key: godot-templates-${{ env.GODOT_VERSION }}
+
+      - name: Download and Setup Godot
+        run: |
+          set -e
+          curl -L -o Godot.zip https://github.com/godotengine/godot/releases/download/${{ env.GODOT_VERSION }}-${{ env.GODOT_RELEASE }}/Godot_v${{ env.GODOT_VERSION }}-${{ env.GODOT_RELEASE }}_macos.universal.zip
+          unzip -q Godot.zip
+          mv Godot.app /Applications/Godot.app
+          echo "/Applications/Godot.app/Contents/MacOS" >> $GITHUB_PATH
+          
+          if [ ! -d "$HOME/Library/Application Support/Godot/export_templates/${{ env.GODOT_VERSION }}.${{ env.GODOT_RELEASE }}" ]; then
+            curl -L -o templates.tpz https://github.com/godotengine/godot/releases/download/${{ env.GODOT_VERSION }}-${{ env.GODOT_RELEASE }}/Godot_v${{ env.GODOT_VERSION }}-${{ env.GODOT_RELEASE }}_export_templates.tpz
+            unzip -q templates.tpz
+            TEMPLATE_DIR="$HOME/Library/Application Support/Godot/export_templates/${{ env.GODOT_VERSION }}.${{ env.GODOT_RELEASE }}"
+            mkdir -p "$TEMPLATE_DIR"
+            mv templates/ios.zip "$TEMPLATE_DIR/ios.zip"
+          fi
+      - name: Godot Export to iOS
+        run: |
+          set -e
+          mkdir -p build/ios
+          Godot --headless --path "$GITHUB_WORKSPACE/" --export-release "iOS" "$GITHUB_WORKSPACE/build/ios/igame.xcodeproj"
+      # ... বাকি স্টেপগুলো অপরিবর্তিত থাকবে
+
+      - name: Build Xcode Project
+        run: |
+          set -e
+          cd build/ios
+          
+          # অটোমেটিক স্কিম ডিটেকশন
+          SCHEME=$(xcodebuild -project igame.xcodeproj -list | awk '/Schemes:/{found=1; next} found && NF{print $1; exit}')
+          
+          xcodebuild -project igame.xcodeproj \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -sdk iphoneos \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            CONFIGURATION_BUILD_DIR="./output" \
+            clean build
+      - name: Package IPA
+        run: |
+          set -e
+          cd build/ios/output
+          mkdir -p Payload
+          mv *.app Payload/
+          zip -r igame_unsigned.ipa Payload
+          rm -rf Payload
+      - name: Upload Unsigned IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-unsigned-ipa
+          path: build/ios/output/igame_unsigned.ipa
