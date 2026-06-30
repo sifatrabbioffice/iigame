@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://we8be3if487j"]
+
+[ext_resource type="PackedScene" uid="uid://yaspvo2mgm4r" path="res://assets/map/nyc/nyc.tscn" id="1_bej5v"]
+[ext_resource type="Script" uid="uid://c3jjicibld351" path="res://scripts/day.gd" id="1_eluqh"]
+[ext_resource type="PackedScene" uid="uid://ckudr8chj1kgo" path="res://player.tscn" id="2_7n0r1"]
+[ext_resource type="PackedScene" uid="uid://b5gpw1vmnlhuy" path="res://assets/map/city1/city1.tscn" id="3_pdxuo"]
+[ext_resource type="PackedScene" uid="uid://d1fm3sjy2242c" path="res://assets/map/city2/city2.tscn" id="4_d2n1y"]
+[ext_resource type="PackedScene" uid="uid://dm8ao1nayatkf" path="res://assets/map/city3/city3.tscn" id="5_scmuy"]
+[ext_resource type="PackedScene" path="res://cotroller.tscn" id="7_s2n43"]
+
+[sub_resource type="Environment" id="Environment_sckju"]
+background_energy_multiplier = 3.45
+ambient_light_source = 3
+ambient_light_energy = 0.92
+
+[node name="iigame" type="Node3D" unique_id=1581970963]
+
+[node name="Day" type="WorldEnvironment" parent="." unique_id=1295792080]
+environment = SubResource("Environment_sckju")
+script = ExtResource("1_eluqh")
+
+[node name="Node3D" parent="." unique_id=2004936880 instance=ExtResource("2_7n0r1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.298363, 15.063461, -147.77083)
+
+[node name="Cotroller" parent="Node3D" unique_id=1186842702 instance=ExtResource("7_s2n43")]
+max_range = 160.0
+deadzone = 0.15
+
+[node name="nyc" parent="." unique_id=2085017895 instance=ExtResource("1_bej5v")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 205.2579, 0.5255978, -256.54034)
+
+[node name="city1" parent="." unique_id=1609315961 instance=ExtResource("3_pdxuo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -105.08454, -0.026770353, -253.30927)
+
+[node name="city2" parent="." unique_id=631159806 instance=ExtResource("4_d2n1y")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 62.393936, 0, 0)
+
+[node name="city3" parent="." unique_id=839942416 instance=ExtResource("5_scmuy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 296.1062, -17.108032, -152.3013)
