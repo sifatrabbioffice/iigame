@@ -45,7 +45,7 @@ jobs:
         run: |
           set -e
           mkdir -p build/ios
-          Godot --headless --path "$GITHUB_WORKSPACE/" --export-release "iOS" "$GITHUB_WORKSPACE/build/ios/igame.xcodeproj"
+          Godot --headless --path "$GITHUB_WORKSPACE/project_folder/" --export-release "iOS" "$GITHUB_WORKSPACE/build/ios/igame.xcodeproj"
       # ... বাকি স্টেপগুলো অপরিবর্তিত থাকবে
 
       - name: Build Xcode Project
