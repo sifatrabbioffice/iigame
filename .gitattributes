@@ -1,1 +1,4 @@
 *.png filter=lfs diff=lfs merge=lfs -text
+assets/map/city2/city2.tscn filter=lfs diff=lfs merge=lfs -text
+assets/map/city2/city3.tscn filter=lfs diff=lfs merge=lfs -text
+assets/map/city3/city3.tscn filter=lfs diff=lfs merge=lfs -text
